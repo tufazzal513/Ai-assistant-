@@ -1,0 +1,6 @@
+{
+  "name": "Arushi",
+  "description": "A production-ready real-time voice-to-voice AI assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
