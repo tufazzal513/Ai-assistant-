@@ -107,6 +107,8 @@ class LiveSessionViewModel(application: Application) : AndroidViewModel(applicat
                 "openApp" -> response = deviceActions.openApp(args?.optString("appName") ?: "")
                 "makeCall" -> response = deviceActions.makeCall(args?.optString("phoneNumber") ?: "")
                 "callContact" -> response = deviceActions.callContact(args?.optString("contactName") ?: "")
+                "toggleFlashlight" -> response = deviceActions.toggleFlashlight(args?.optBoolean("enable") ?: false)
+                "searchYouTube" -> response = deviceActions.searchYouTube(args?.optString("query") ?: "")
                 else -> {
                     response.put("success", false)
                     response.put("error", "Unknown function")

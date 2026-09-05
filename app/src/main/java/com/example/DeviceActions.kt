@@ -2,6 +2,7 @@ package com.example
 
 import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.provider.ContactsContract
 import org.json.JSONObject
@@ -84,6 +85,34 @@ class DeviceActions(private val context: Context) {
             JSONObject().put("success", false).put("error", "Multiple matching contacts found: \$matchNames")
         } else {
             JSONObject().put("success", false).put("error", "Contact not found.")
+        }
+    }
+
+    fun toggleFlashlight(enable: Boolean): JSONObject {
+        return try {
+            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            val cameraId = cameraManager.cameraIdList[0]
+            cameraManager.setTorchMode(cameraId, enable)
+            JSONObject().put("success", true).put("action", "toggleFlashlight").put("state", if(enable) "on" else "off")
+        } catch (e: Exception) {
+            JSONObject().put("success", false).put("error", e.message)
+        }
+    }
+
+    fun searchYouTube(query: String): JSONObject {
+        val intent = Intent(Intent.ACTION_SEARCH).apply {
+            setPackage("com.google.android.youtube")
+            putExtra("query", query)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        return try {
+            context.startActivity(intent)
+            JSONObject().put("success", true).put("action", "searchYouTube")
+        } catch (e: Exception) {
+            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/results?search_query=\$query"))
+            webIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(webIntent)
+            JSONObject().put("success", true).put("action", "searchYouTube_browser")
         }
     }
 }

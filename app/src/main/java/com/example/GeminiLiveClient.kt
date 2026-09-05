@@ -123,11 +123,41 @@ class GeminiLiveClient(private val apiKey: String) {
                                 put("required", JSONArray().put("contactName"))
                             })
                         })
+                        put(JSONObject().apply {
+                            put("name", "toggleFlashlight")
+                            put("description", "Turns the phone's flashlight on or off.")
+                            put("parameters", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("properties", JSONObject().apply {
+                                    put("enable", JSONObject().apply {
+                                        put("type", "BOOLEAN")
+                                        put("description", "True to turn on, false to turn off.")
+                                    })
+                                })
+                                put("required", JSONArray().put("enable"))
+                            })
+                        })
+                        put(JSONObject().apply {
+                            put("name", "searchYouTube")
+                            put("description", "Searches for a video on YouTube.")
+                            put("parameters", JSONObject().apply {
+                                put("type", "OBJECT")
+                                put("properties", JSONObject().apply {
+                                    put("query", JSONObject().apply {
+                                        put("type", "STRING")
+                                        put("description", "The search query.")
+                                    })
+                                })
+                                put("required", JSONArray().put("query"))
+                            })
+                        })
                     })
                 }))
             })
         }
         webSocket?.send(setupMsg.toString())
+
+        // Send an initial client content to fully initiate the interaction loop ONLY after setup is complete, not here.
     }
 
     private fun handleMessage(text: String) {
@@ -136,6 +166,8 @@ class GeminiLiveClient(private val apiKey: String) {
             if (json.has("setupComplete")) {
                 Log.d("GeminiLiveClient", "Setup complete received")
                 scope.launch { _events.emit(LiveEvent.Connected) }
+                // Now it's safe to send initial content
+                sendClientContent("Hello Arushi, are you there?")
             } else if (json.has("serverContent")) {
                 val serverContent = json.getJSONObject("serverContent")
                 if (serverContent.has("modelTurn")) {
